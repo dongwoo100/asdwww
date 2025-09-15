@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>관리자 / 사용자</title>
+</head>
+<body>
+  <h2>관리자 / 사용자 로그인</h2>
+  <input type="text" id="codeInput" placeholder="코드를 입력하세요">
+  <button onclick="checkCode()">확인</button>
+
+  <div id="adminBox" style="display:none; margin-top:20px;">
+    <h3>관리자 모드</h3>
+    <input type="text" id="linkInput" placeholder="링크를 입력하세요">
+    <button onclick="saveLink()">저장</button>
+  </div>
+
+  <div id="userBox" style="display:none; margin-top:20px;">
+    <h3>사용자 모드</h3>
+    <p id="linkOutput"></p>
+  </div>
+
+  <script>
+    // 🔴 여기에 방금 발급받은 구글 앱스 스크립트 URL 넣기
+    const SCRIPT_URL = "https://script.google.com/macros/s/___YOUR_SCRIPT_ID___/exec";
+
+    function checkCode() {
+      let code = document.getElementById("codeInput").value;
+      if (code === "AP12389VX23") {
+        document.getElementById("adminBox").style.display = "block";
+        document.getElementById("userBox").style.display = "none";
+      } else if (code === "AP12389VX12") {
+        document.getElementById("adminBox").style.display = "none";
+        document.getElementById("userBox").style.display = "block";
+        fetch(SCRIPT_URL)
+          .then(res => res.text())
+          .then(link => {
+            if (link) {
+              document.getElementById("linkOutput").innerHTML =
+                `<a href="${link}" target="_blank">${link}</a>`;
+            } else {
+              document.getElementById("linkOutput").innerText = "아직 관리자가 링크를 저장하지 않았어요.";
+            }
+          });
+      } else {
+        alert("코드가 틀렸습니다!");
+      }
+    }
+
+    function saveLink() {
+      let link = document.getElementById("linkInput").value;
+      if (link) {
+        fetch(SCRIPT_URL, {
+          method: "POST",
+          body: new URLSearchParams({ link: link })
+        })
+        .then(res => res.text())
+        .then(msg => alert(msg));
+      } else {
+        alert("링크를 입력하세요!");
+      }
+    }
+  </script>
+</body>
+</html>
